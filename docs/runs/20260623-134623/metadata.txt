@@ -1,0 +1,4 @@
+timestamp=20260623-134623
+commit=b9c98f5
+dirty=True
+message=perf: Reuse materialized image files
