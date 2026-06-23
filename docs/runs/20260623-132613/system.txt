@@ -1,0 +1,56 @@
+Tue Jun 23 13:26:20 JST 2026
+ 13:26:20 up 11:00,  2 users,  load average: 1.90, 1.55, 1.01
+               total        used        free      shared  buff/cache   available
+Mem:           3.7Gi       1.2Gi       271Mi       2.9Mi       2.5Gi       2.5Gi
+Swap:          1.0Gi        28Ki       1.0Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root        15G   13G  1.5G  90% /
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-06-23 13:24:47 JST; 1min 32s ago
+       Docs: man:nginx(8)
+    Process: 84725 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 84727 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 84728 (nginx)
+      Tasks: 3 (limit: 4496)
+     Memory: 30.7M (peak: 38.4M)
+        CPU: 8.494s
+     CGroup: /system.slice/nginx.service
+             ├─84728 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─84729 "nginx: worker process"
+             └─84730 "nginx: worker process"
+
+● mysql.service - MySQL Community Server
+     Loaded: loaded (/usr/lib/systemd/system/mysql.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-06-23 13:24:49 JST; 1min 30s ago
+    Process: 84739 ExecStartPre=/usr/share/mysql/mysql-systemd-start pre (code=exited, status=0/SUCCESS)
+   Main PID: 84748 (mysqld)
+     Status: "Server is operational"
+      Tasks: 39 (limit: 4496)
+     Memory: 952.5M (peak: 952.9M)
+        CPU: 19.176s
+     CGroup: /system.slice/mysql.service
+             └─84748 /usr/sbin/mysqld
+
+● isu-python.service - isu-python
+     Loaded: loaded (/etc/systemd/system/isu-python.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-06-23 13:24:47 JST; 1min 32s ago
+   Main PID: 84733 (gunicorn)
+      Tasks: 4 (limit: 4496)
+     Memory: 389.7M (peak: 391.4M)
+        CPU: 1min 1.936s
+     CGroup: /system.slice/isu-python.service
+             ├─84733 /home/isucon/private_isu/webapp/python/.venv/bin/python3 /home/isucon/private_isu/webapp/python/.venv/bin/gunicorn app:app -b 0.0.0.0:8080 --workers 2 --log-file - --access-logfile -
+             ├─84734 /home/isucon/private_isu/webapp/python/.venv/bin/python3 /home/isucon/private_isu/webapp/python/.venv/bin/gunicorn app:app -b 0.0.0.0:8080 --workers 2 --log-file - --access-logfile -
+             └─84735 /home/isucon/private_isu/webapp/python/.venv/bin/python3 /home/isucon/private_isu/webapp/python/.venv/bin/gunicorn app:app -b 0.0.0.0:8080 --workers 2 --log-file - --access-logfile -
+
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84735]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts?max_created_at=2016-01-02T11%3A43%3A27%2B09%3A00 HTTP/1.0" 200 34367 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84735]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts/4513 HTTP/1.0" 200 4309 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84734]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts/3632 HTTP/1.0" 200 3542 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84734]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts/1885 HTTP/1.0" 200 3266 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84735]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts?max_created_at=2016-01-02T11%3A44%3A04%2B09%3A00 HTTP/1.0" 200 34255 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84734]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts/1735 HTTP/1.0" 200 2499 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84734]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts/1498 HTTP/1.0" 200 3353 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84734]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts/559 HTTP/1.0" 200 3092 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84735]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts?max_created_at=2016-01-02T11%3A43%3A44%2B09%3A00 HTTP/1.0" 200 34039 "-" "benchmarker"
+Jun 23 13:25:53 ip-192-168-1-10 gunicorn[84735]: 127.0.0.1 - - [23/Jun/2026:13:25:53 +0900] "GET /posts?max_created_at=2016-01-02T11%3A43%3A24%2B09%3A00 HTTP/1.0" 200 34509 "-" "benchmarker"

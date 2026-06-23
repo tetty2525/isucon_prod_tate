@@ -1,0 +1,4 @@
+timestamp=20260623-132613
+commit=2a1cc42
+dirty=True
+message=perf: Simplify batched comment loading

@@ -6,3 +6,4 @@ DateTime,Commit,Dirty,Score,Pass,CPU_User(%),CPU_Sys(%),CPU_Idle(%),CPU_IOWait(%
 2026-06-23 13:13:22,9e0b417,False,59912,True,41.8,14.8,39.0,4.4,0.08,0.08,1.01,perf: Avoid full scans in post list queries
 2026-06-23 13:19:55,d5e9152,False,76681,True,62.4,18.7,15.3,3.6,0.64,0.65,2.43,perf: Run gunicorn with two workers
 2026-06-23 13:23:16,505b0f1,False,118305,True,61.1,19.6,15.8,3.5,0.15,0.15,2.63,perf: Batch load post comments and users
+2026-06-23 13:26:03,2a1cc42,False,119628,True,60.8,19.7,15.7,3.8,0.08,0.08,2.34,perf: Simplify batched comment loading
