@@ -15,6 +15,14 @@ from pymemcache.client.base import Client as MemcacheClient
 
 UPLOAD_LIMIT = 10 * 1024 * 1024  # 10mb
 POSTS_PER_PAGE = 20
+IMAGE_CACHE_LIMIT = int(os.environ.get("ISUCONP_IMAGE_CACHE_LIMIT", "1000"))
+MIME_EXTENSIONS = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+    "image/gif": ".gif",
+}
+STATIC_PATH = pathlib.Path(__file__).resolve().parent.parent / "public"
+IMAGE_DIR = STATIC_PATH / "image"
 
 
 _config = None
@@ -67,6 +75,49 @@ def db_initialize():
     ]
     for q in sqls:
         cur.execute(q)
+    remove_dynamic_image_files()
+    materialize_recent_images()
+
+
+def image_ext(mime):
+    return MIME_EXTENSIONS.get(mime, "")
+
+
+def image_path(post_id, mime):
+    ext = image_ext(mime)
+    if not ext:
+        return None
+    return IMAGE_DIR / f"{post_id}{ext}"
+
+
+def write_image_file(post):
+    path = image_path(post["id"], post["mime"])
+    if path is None or path.exists():
+        return
+
+    IMAGE_DIR.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+    with open(tmp_path, "wb") as f:
+        f.write(post["imgdata"])
+    os.replace(tmp_path, path)
+
+
+def remove_dynamic_image_files():
+    if not IMAGE_DIR.exists():
+        return
+    for path in IMAGE_DIR.iterdir():
+        if path.is_file() and re.fullmatch(r"[0-9]+\.(jpg|png|gif)", path.name):
+            path.unlink()
+
+
+def materialize_recent_images():
+    cursor = db().cursor()
+    cursor.execute(
+        "SELECT `id`, `mime`, `imgdata` FROM `posts` ORDER BY `created_at` DESC LIMIT %s",
+        (IMAGE_CACHE_LIMIT,),
+    )
+    for post in cursor:
+        write_image_file(post)
 
 
 _mcclient = None
@@ -167,8 +218,7 @@ def make_posts(results, all_comments=False):
 
 
 # app setup
-static_path = pathlib.Path(__file__).resolve().parent.parent / "public"
-app = flask.Flask(__name__, static_folder=str(static_path), static_url_path="")
+app = flask.Flask(__name__, static_folder=str(STATIC_PATH), static_url_path="")
 # app.debug = True
 
 # Flask-Session
@@ -179,16 +229,7 @@ Session(app)
 
 @app.template_global()
 def image_url(post):
-    ext = ""
-    mime = post["mime"]
-    if mime == "image/jpeg":
-        ext = ".jpg"
-    elif mime == "image/png":
-        ext = ".png"
-    elif mime == "image/gif":
-        ext = ".gif"
-
-    return "/image/%s%s" % (post["id"], ext)
+    return "/image/%s%s" % (post["id"], image_ext(post["mime"]))
 
 
 # http://flask.pocoo.org/snippets/28/
@@ -414,6 +455,7 @@ def post_index():
     cursor = db().cursor()
     cursor.execute(query, (me["id"], mime, imgdata, flask.request.form.get("body")))
     pid = cursor.lastrowid
+    write_image_file({"id": pid, "mime": mime, "imgdata": imgdata})
     return flask.redirect("/posts/%d" % pid)
 
 
@@ -426,8 +468,10 @@ def get_image(id, ext):
         return ""
 
     cursor = db().cursor()
-    cursor.execute("SELECT * FROM `posts` WHERE `id` = %s", (id,))
+    cursor.execute("SELECT `id`, `mime`, `imgdata` FROM `posts` WHERE `id` = %s", (id,))
     post = cursor.fetchone()
+    if post is None:
+        flask.abort(404)
 
     mime = post["mime"]
     if (
@@ -438,6 +482,7 @@ def get_image(id, ext):
         or ext == "gif"
         and mime == "image/gif"
     ):
+        write_image_file(post)
         return flask.Response(post["imgdata"], mimetype=mime)
 
     flask.abort(404)
