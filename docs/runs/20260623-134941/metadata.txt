@@ -1,0 +1,4 @@
+timestamp=20260623-134941
+commit=d08f426
+dirty=True
+message=perf: Avoid storing uploaded image blobs
