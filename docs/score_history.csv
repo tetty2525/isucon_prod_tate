@@ -4,3 +4,4 @@ DateTime,Commit,Dirty,Score,Pass,CPU_User(%),CPU_Sys(%),CPU_Idle(%),CPU_IOWait(%
 2026-06-23 13:07:19,9e2db7f,False,21406,True,42.5,6.9,47.4,3.2,0.8,0.72,0.78,perf: Serve cached images from nginx
 2026-06-23 13:10:45,01a09a0,False,27926,True,43.1,7.8,46.5,2.6,0.09,0.09,0.96,perf: Limit post list queries
 2026-06-23 13:13:22,9e0b417,False,59912,True,41.8,14.8,39.0,4.4,0.08,0.08,1.01,perf: Avoid full scans in post list queries
+2026-06-23 13:19:55,d5e9152,False,76681,True,62.4,18.7,15.3,3.6,0.64,0.65,2.43,perf: Run gunicorn with two workers
