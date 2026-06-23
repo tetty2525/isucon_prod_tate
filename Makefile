@@ -15,6 +15,10 @@ deploy-conf:
 deploy-app:
 	rsync -avz -e "ssh -i $(SSH_KEY) -o StrictHostKeyChecking=no" webapp/ $(SSH_USER)@$(SERVER_IP):/home/isucon/private_isu/webapp/
 
+setup:
+	scp -i $(SSH_KEY) setup.sh $(SSH_USER)@$(SERVER_IP):/tmp/setup.sh
+	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "chmod +x /tmp/setup.sh && /tmp/setup.sh"
+
 restart:
 	@echo "--- ログの初期化 ---"
 	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo truncate -s 0 /var/log/nginx/access.log && sudo truncate -s 0 /var/log/mysql/mysql-slow.log"

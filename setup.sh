@@ -24,8 +24,8 @@ fi
 
 if ! command -v pt-query-digest &> /dev/null; then
   echo "Installing percona-toolkit..."
-  sudo apt-get update
-  sudo apt-get install -y percona-toolkit unzip
+  sudo DEBIAN_FRONTEND=noninteractive apt-get update
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y percona-toolkit unzip
 fi
 
 if ! command -v alp &> /dev/null; then
