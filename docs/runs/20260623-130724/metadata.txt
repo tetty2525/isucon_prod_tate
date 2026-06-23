@@ -1,0 +1,4 @@
+timestamp=20260623-130724
+commit=9e2db7f
+dirty=True
+message=perf: Serve cached images from nginx
