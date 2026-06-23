@@ -21,7 +21,7 @@ setup:
 
 restart:
 	@echo "--- ログの初期化 ---"
-	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo truncate -s 0 /var/log/nginx/access.log && sudo truncate -s 0 /var/log/mysql/mysql-slow.log"
+	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo touch /var/log/mysql/mysql-slow.log && sudo chown mysql:mysql /var/log/mysql/mysql-slow.log && sudo truncate -s 0 /var/log/nginx/access.log && sudo truncate -s 0 /var/log/mysql/mysql-slow.log"
 	@echo "--- サービスの再起動 ---"
 	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo systemctl restart nginx mysql isu-python"
 
