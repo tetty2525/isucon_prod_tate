@@ -13,7 +13,7 @@ deploy-conf:
 	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo cp /tmp/nginx.conf /etc/nginx/nginx.conf && sudo cp /tmp/isucon.conf /etc/nginx/sites-available/isucon.conf && sudo cp /tmp/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf"
 
 deploy-app:
-	rsync -avz -e "ssh -i $(SSH_KEY) -o StrictHostKeyChecking=no" webapp/ $(SSH_USER)@$(SERVER_IP):/home/isucon/private_isu/webapp/
+	rsync -avz --exclude='__pycache__/' --exclude='*.pyc' -e "ssh -i $(SSH_KEY) -o StrictHostKeyChecking=no" webapp/ $(SSH_USER)@$(SERVER_IP):/home/isucon/private_isu/webapp/
 
 setup:
 	scp -i $(SSH_KEY) setup.sh $(SSH_USER)@$(SERVER_IP):/tmp/setup.sh
