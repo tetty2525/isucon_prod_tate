@@ -181,36 +181,65 @@ def get_session_user():
     return None
 
 
+def placeholders(values):
+    return ",".join(["%s"] * len(values))
+
+
 def make_posts(results, all_comments=False):
     posts = []
+    post_candidates = list(results)
+    if not post_candidates:
+        return posts
+
+    post_ids = [post["id"] for post in post_candidates]
     cursor = db().cursor()
-    for post in results:
+
+    cursor.execute(
+        "SELECT `post_id`, COUNT(*) AS `count` FROM `comments` "
+        f"WHERE `post_id` IN ({placeholders(post_ids)}) GROUP BY `post_id`",
+        post_ids,
+    )
+    comment_counts = {row["post_id"]: row["count"] for row in cursor}
+
+    if all_comments:
         cursor.execute(
-            "SELECT COUNT(*) AS `count` FROM `comments` WHERE `post_id` = %s",
-            (post["id"],),
+            "SELECT * FROM `comments` "
+            f"WHERE `post_id` IN ({placeholders(post_ids)}) "
+            "ORDER BY `post_id`, `created_at` DESC",
+            post_ids,
         )
-        post["comment_count"] = cursor.fetchone()["count"]
-
-        query = (
-            "SELECT * FROM `comments` WHERE `post_id` = %s ORDER BY `created_at` DESC"
+    else:
+        cursor.execute(
+            "SELECT * FROM ("
+            "  SELECT c.*, ROW_NUMBER() OVER (PARTITION BY c.`post_id` ORDER BY c.`created_at` DESC) AS rn "
+            "  FROM `comments` c "
+            f"  WHERE c.`post_id` IN ({placeholders(post_ids)})"
+            ") ranked WHERE rn <= 3 ORDER BY `post_id`, `created_at` DESC",
+            post_ids,
         )
-        if not all_comments:
-            query += " LIMIT 3"
+    comments_by_post = {}
+    user_ids = {post["user_id"] for post in post_candidates}
+    for comment in cursor:
+        comments_by_post.setdefault(comment["post_id"], []).append(comment)
+        user_ids.add(comment["user_id"])
 
-        cursor.execute(query, (post["id"],))
-        comments = list(cursor)
+    cursor.execute(
+        f"SELECT * FROM `users` WHERE `id` IN ({placeholders(user_ids)})",
+        list(user_ids),
+    )
+    users = {user["id"]: user for user in cursor}
+
+    for post in post_candidates:
+        post["comment_count"] = comment_counts.get(post["id"], 0)
+        comments = comments_by_post.get(post["id"], [])
         for comment in comments:
-            cursor.execute(
-                "SELECT * FROM `users` WHERE `id` = %s", (comment["user_id"],)
-            )
-            comment["user"] = cursor.fetchone()
+            comment["user"] = users.get(comment["user_id"])
         comments.reverse()
         post["comments"] = comments
 
-        cursor.execute("SELECT * FROM `users` WHERE `id` = %s", (post["user_id"],))
-        post["user"] = cursor.fetchone()
+        post["user"] = users.get(post["user_id"])
 
-        if not post["user"]["del_flg"]:
+        if post["user"] and not post["user"]["del_flg"]:
             posts.append(post)
 
         if len(posts) >= POSTS_PER_PAGE:
