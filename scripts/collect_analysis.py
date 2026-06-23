@@ -11,7 +11,7 @@ SSH_BASE = ["ssh", "-i", SSH_KEY, "-o", "StrictHostKeyChecking=no", SSH_HOST]
 
 COMMANDS = {
     "alp.txt": "sudo alp ltsv --file=/var/log/nginx/access.log --sort=sum -r -m '/image/[0-9]+,/posts/[0-9]+,/@.*'",
-    "slow_query.txt": "sudo pt-query-digest /var/log/mysql/mysql-slow.log | head -n 120",
+    "slow_query.txt": "sudo pt-query-digest /var/log/mysql/mysql-slow.log | head -n 120 | cut -c 1-4000",
     "system.txt": "date; uptime; free -h; df -h /; systemctl --no-pager --full status nginx mysql isu-python | head -n 80",
 }
 
@@ -29,6 +29,7 @@ def run_remote(command):
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        errors="replace",
         check=False,
     )
 

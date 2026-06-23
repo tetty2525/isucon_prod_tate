@@ -37,7 +37,7 @@ anal:
 	@echo "========================================="
 	@echo "  MYSQL SLOW QUERY ANAL (pt-query-digest)"
 	@echo "========================================="
-	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo pt-query-digest /var/log/mysql/mysql-slow.log | head -n 60"
+	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo pt-query-digest /var/log/mysql/mysql-slow.log | head -n 60 | cut -c 1-4000"
 
 snapshot:
 	./scripts/collect_analysis.py
