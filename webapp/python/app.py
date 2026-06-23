@@ -111,25 +111,15 @@ def remove_dynamic_image_files():
     if not IMAGE_DIR.exists():
         return
     for path in IMAGE_DIR.iterdir():
-        m = re.fullmatch(r"([0-9]+)\.(jpg|png|gif)", path.name)
-        if path.is_file() and m and int(m.group(1)) > 10000:
+        if path.is_file() and re.fullmatch(r"[0-9]+\.(jpg|png|gif)", path.name):
             path.unlink()
 
 
 def materialize_recent_images():
     cursor = db().cursor()
     cursor.execute(
-        "SELECT `id`, `mime` FROM `posts` ORDER BY `created_at` DESC LIMIT %s",
+        "SELECT `id`, `mime`, `imgdata` FROM `posts` ORDER BY `created_at` DESC LIMIT %s",
         (IMAGE_CACHE_LIMIT,),
-    )
-    missing_posts = [post for post in cursor if not image_path(post["id"], post["mime"]).exists()]
-    if not missing_posts:
-        return
-
-    missing_ids = [post["id"] for post in missing_posts]
-    cursor.execute(
-        f"SELECT `id`, `mime`, `imgdata` FROM `posts` WHERE `id` IN ({placeholders(missing_ids)})",
-        missing_ids,
     )
     for post in cursor:
         write_image_file(post)
