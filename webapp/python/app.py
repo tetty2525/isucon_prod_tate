@@ -52,6 +52,7 @@ def config():
 
 
 _db = None
+_user_cache = {}
 
 
 def db():
@@ -66,6 +67,9 @@ def db():
 
 
 def db_initialize():
+    global _user_cache
+    _user_cache = {}
+
     cur = db().cursor()
     sqls = [
         "DELETE FROM users WHERE id > 1000",
@@ -175,14 +179,26 @@ def calculate_passhash(account_name: str, password: str):
 def get_session_user():
     user = flask.session.get("user")
     if user:
-        cur = db().cursor()
-        cur.execute("SELECT * FROM `users` WHERE `id` = %s", (user["id"],))
-        return cur.fetchone()
+        return fetch_users([user["id"]]).get(user["id"])
     return None
 
 
 def placeholders(values):
     return ",".join(["%s"] * len(values))
+
+
+def fetch_users(user_ids):
+    ids = list(dict.fromkeys(user_ids))
+    missing_ids = [user_id for user_id in ids if user_id not in _user_cache]
+    if missing_ids:
+        cursor = db().cursor()
+        cursor.execute(
+            f"SELECT * FROM `users` WHERE `id` IN ({placeholders(missing_ids)})",
+            missing_ids,
+        )
+        for user in cursor:
+            _user_cache[user["id"]] = user
+    return {user_id: _user_cache.get(user_id) for user_id in ids}
 
 
 def make_posts(results, all_comments=False):
@@ -206,11 +222,7 @@ def make_posts(results, all_comments=False):
         comments_by_post.setdefault(comment["post_id"], []).append(comment)
         user_ids.add(comment["user_id"])
 
-    cursor.execute(
-        f"SELECT * FROM `users` WHERE `id` IN ({placeholders(user_ids)})",
-        list(user_ids),
-    )
-    users = {user["id"]: user for user in cursor}
+    users = fetch_users(user_ids)
 
     for post in post_candidates:
         all_post_comments = comments_by_post.get(post["id"], [])
