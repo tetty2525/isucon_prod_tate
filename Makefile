@@ -14,7 +14,6 @@ deploy-conf:
 
 deploy-app:
 	rsync -avz -e "ssh -i $(SSH_KEY) -o StrictHostKeyChecking=no" webapp/ $(SSH_USER)@$(SERVER_IP):/home/isucon/private_isu/webapp/
-	scp -i $(SSH_KEY) env.sh $(SSH_USER)@$(SERVER_IP):/home/isucon/private_isu/env.sh
 
 restart:
 	@echo "--- ログの初期化 ---"
