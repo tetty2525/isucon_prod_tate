@@ -484,7 +484,7 @@ def post_index():
 
     query = "INSERT INTO `posts` (`user_id`, `mime`, `imgdata`, `body`) VALUES (%s,%s,%s,%s)"
     cursor = db().cursor()
-    cursor.execute(query, (me["id"], mime, imgdata, flask.request.form.get("body")))
+    cursor.execute(query, (me["id"], mime, b"", flask.request.form.get("body")))
     pid = cursor.lastrowid
     write_image_file({"id": pid, "mime": mime, "imgdata": imgdata})
     return flask.redirect("/posts/%d" % pid)
