@@ -15,6 +15,7 @@ from pymemcache.client.base import Client as MemcacheClient
 
 UPLOAD_LIMIT = 10 * 1024 * 1024  # 10mb
 POSTS_PER_PAGE = 20
+POSTS_FETCH_LIMIT = POSTS_PER_PAGE * 2
 IMAGE_CACHE_LIMIT = int(os.environ.get("ISUCONP_IMAGE_CACHE_LIMIT", "1000"))
 MIME_EXTENSIONS = {
     "image/jpeg": ".jpg",
@@ -326,11 +327,9 @@ def get_index():
 
     cursor = db().cursor()
     cursor.execute(
-        "SELECT p.`id`, p.`user_id`, p.`body`, p.`created_at`, p.`mime` "
-        "FROM `posts` p JOIN `users` u ON p.`user_id` = u.`id` "
-        "WHERE u.`del_flg` = 0 "
-        "ORDER BY p.`created_at` DESC LIMIT %s",
-        (POSTS_PER_PAGE,),
+        "SELECT `id`, `user_id`, `body`, `created_at`, `mime` "
+        "FROM `posts` ORDER BY `created_at` DESC LIMIT %s",
+        (POSTS_FETCH_LIMIT,),
     )
     posts = make_posts(cursor.fetchall())
 
@@ -404,11 +403,10 @@ def get_posts():
 
     max_created_at = _parse_iso8601(max_created_at)
     cursor.execute(
-        "SELECT p.`id`, p.`user_id`, p.`body`, p.`mime`, p.`created_at` "
-        "FROM `posts` p JOIN `users` u ON p.`user_id` = u.`id` "
-        "WHERE p.`created_at` <= %s AND u.`del_flg` = 0 "
-        "ORDER BY p.`created_at` DESC LIMIT %s",
-        (max_created_at, POSTS_PER_PAGE),
+        "SELECT `id`, `user_id`, `body`, `mime`, `created_at` "
+        "FROM `posts` WHERE `created_at` <= %s "
+        "ORDER BY `created_at` DESC LIMIT %s",
+        (max_created_at, POSTS_FETCH_LIMIT),
     )
     results = cursor.fetchall()
     posts = make_posts(results)
