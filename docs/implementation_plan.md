@@ -1,44 +1,36 @@
-# 第1次チューニングプラン (Wave 1)
+# 第2次チューニングプラン (Wave 2): DBインデックスの追加
 
-## 初期ベンチマークの分析結果
-スコアは **564** でした。`alp` の解析結果から以下の致命的なボトルネックが判明しました。
+## 分析結果の振り返り
+先ほどのベンチマークで以下の大きなボトルネックが判明しました。
 
-1. **静的ファイルの異常な遅延**
-   - `/favicon.ico` や `/js/main.js` が平均で2〜3秒かかっています。
-   - 本来一瞬で返すべき静的ファイルがPythonアプリケーション（Gunicorn）に転送されており、そこで順番待ちが発生しています。
-2. **`/image/[0-9]+` の重圧**
-   - リクエストの大部分（合計287秒）を消費しています。これもDBやアプリ経由で配信されている可能性があります。
-3. **`/` (トップページ) の遅延**
-   - 平均3.3秒かかっており、N+1問題やインデックス不足の典型的な症状が出ています。
+1. **DBのフルスキャン（重いSQL）**
+   `pt-query-digest` の結果から、トップページ表示時に呼ばれる以下のSQLが致命的に遅いことが判明しました。
+   `SELECT * FROM comments WHERE post_id = ? ORDER BY created_at DESC LIMIT 3`
+   このSQLは1回呼ばれるごとに **約9万7千行（ほぼ全行）** をスキャンしており、ベンチマーク中に合計で**76秒**もDBを占有していました（完全なインデックス不足です）。
 
-※ `pt-query-digest` のインストールが環境起因で一部失敗しており、MySQL側の分析ログが出力されませんでした。
+2. **画像のDB配信の限界**
+   `alp` の結果から、依然として `/image/[0-9]+` が合計で433秒もかかっており、Pythonを通じた画像のDB配信が最大の重りになっています。
 
 ## Proposed Changes (修正方針)
 
-### 1. 計測基盤の修復
-- `percona-toolkit` を再インストールし、次回のベンチマークでSQLのボトルネック（スロークエリ）を可視化できるようにします。
+まずは効果が最も高く、簡単に修正できる **「DBへのインデックス追加」** を行います。画像のファイル化（Nginx直接配信）はさらに大きなコード変更が必要になるため、次回のWave 3で行う予定です。
 
-### 2. Nginx: 静的ファイルの直接配信 (try_files)
-- `etc/nginx/isucon.conf` に以下の設定を追加し、CSS/JS/画像をPythonへ送らずにNginxが直接ディスクから返すようにします。
+以下のインデックスをMySQLに追加します。
+```sql
+-- commentsテーブルのN+1クエリ解消用
+ALTER TABLE comments ADD INDEX post_id_created_at_idx (post_id, created_at DESC);
+ALTER TABLE comments ADD INDEX user_id_idx (user_id);
 
-#### [MODIFY] etc/nginx/isucon.conf
-```nginx
-location ~ ^/(css|js|img|favicon\.ico) {
-    root /home/isucon/private_isu/webapp/public;
-    expires 1d;
-    try_files $uri =404;
-}
+-- postsテーブルのタイムライン表示高速化用
+ALTER TABLE posts ADD INDEX created_at_idx (created_at DESC);
+ALTER TABLE posts ADD INDEX user_id_created_at_idx (user_id, created_at DESC);
 ```
 
-※ `image/` の画像ファイルがDB管理かファイル管理かを確認し、可能であればこれもNginx直接配信へ切り替えます。
-
-## Verification Plan
-1. 上記の設定をローカルでコミットし、`make deploy` でサーバーへ適用します。
-2. 再度 `make bench` を実行します。
-3. **期待される効果**: 静的ファイルへのアクセスが `alp` の上位から消え、スコアが劇的に向上するはずです。同時に、トップページ (`/`) のSQLボトルネックが浮き彫りになります。
+### 適用方法
+ISUCON（Private-isu）の仕様上、初期化時（`/initialize`）にテーブルのDROP/CREATEが走らないため、直接MySQLに上記の `ALTER TABLE` を流し込むだけで永続化されます。（念のためファイルにも残しておきます）
 
 ---
 ## User Review Required
 
 上記の方針でよろしいでしょうか？
-「承認」いただけましたら、Nginxの設定変更とツールの再インストールを実施し、第2回目のベンチマークへと進みます！
+「承認」いただけましたら、サーバー上で直接インデックスを追加するSQLを実行し、再度ベンチマーク（Wave 2）に進みます！

@@ -1,4 +1,4 @@
-.PHONY: deploy deploy-conf deploy-app restart anal setup bench
+.PHONY: deploy deploy-conf deploy-app restart anal setup bench snapshot
 
 SERVER_IP=54.150.95.245
 SSH_USER=isucon
@@ -26,10 +26,7 @@ restart:
 	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo systemctl restart nginx mysql isu-python"
 
 bench: restart
-	@echo "========================================="
-	@echo "  RUNNING BENCHMARKER"
-	@echo "========================================="
-	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "/home/isucon/private_isu/benchmarker/bin/benchmarker -u /home/isucon/private_isu/benchmarker/userdata -t http://127.0.0.1"
+	./scripts/run_bench.py
 
 anal:
 	@echo "========================================="
@@ -40,3 +37,6 @@ anal:
 	@echo "  MYSQL SLOW QUERY ANAL (pt-query-digest)"
 	@echo "========================================="
 	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo pt-query-digest /var/log/mysql/mysql-slow.log | head -n 60"
+
+snapshot:
+	./scripts/collect_analysis.py
