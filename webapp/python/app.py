@@ -195,28 +195,11 @@ def make_posts(results, all_comments=False):
     cursor = db().cursor()
 
     cursor.execute(
-        "SELECT `post_id`, COUNT(*) AS `count` FROM `comments` "
-        f"WHERE `post_id` IN ({placeholders(post_ids)}) GROUP BY `post_id`",
+        "SELECT * FROM `comments` "
+        f"WHERE `post_id` IN ({placeholders(post_ids)}) "
+        "ORDER BY `post_id`, `created_at` DESC",
         post_ids,
     )
-    comment_counts = {row["post_id"]: row["count"] for row in cursor}
-
-    if all_comments:
-        cursor.execute(
-            "SELECT * FROM `comments` "
-            f"WHERE `post_id` IN ({placeholders(post_ids)}) "
-            "ORDER BY `post_id`, `created_at` DESC",
-            post_ids,
-        )
-    else:
-        cursor.execute(
-            "SELECT * FROM ("
-            "  SELECT c.*, ROW_NUMBER() OVER (PARTITION BY c.`post_id` ORDER BY c.`created_at` DESC) AS rn "
-            "  FROM `comments` c "
-            f"  WHERE c.`post_id` IN ({placeholders(post_ids)})"
-            ") ranked WHERE rn <= 3 ORDER BY `post_id`, `created_at` DESC",
-            post_ids,
-        )
     comments_by_post = {}
     user_ids = {post["user_id"] for post in post_candidates}
     for comment in cursor:
@@ -230,8 +213,9 @@ def make_posts(results, all_comments=False):
     users = {user["id"]: user for user in cursor}
 
     for post in post_candidates:
-        post["comment_count"] = comment_counts.get(post["id"], 0)
-        comments = comments_by_post.get(post["id"], [])
+        all_post_comments = comments_by_post.get(post["id"], [])
+        post["comment_count"] = len(all_post_comments)
+        comments = all_post_comments if all_comments else all_post_comments[:3]
         for comment in comments:
             comment["user"] = users.get(comment["user_id"])
         comments.reverse()
