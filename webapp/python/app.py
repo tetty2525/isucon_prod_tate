@@ -326,7 +326,11 @@ def get_index():
 
     cursor = db().cursor()
     cursor.execute(
-        "SELECT `id`, `user_id`, `body`, `created_at`, `mime` FROM `posts` ORDER BY `created_at` DESC"
+        "SELECT p.`id`, p.`user_id`, p.`body`, p.`created_at`, p.`mime` "
+        "FROM `posts` p JOIN `users` u ON p.`user_id` = u.`id` "
+        "WHERE u.`del_flg` = 0 "
+        "ORDER BY p.`created_at` DESC LIMIT %s",
+        (POSTS_PER_PAGE,),
     )
     posts = make_posts(cursor.fetchall())
 
@@ -346,8 +350,9 @@ def get_user_list(account_name):
         flask.abort(404)  # raises exception
 
     cursor.execute(
-        "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` WHERE `user_id` = %s ORDER BY `created_at` DESC",
-        (user["id"],),
+        "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` "
+        "WHERE `user_id` = %s ORDER BY `created_at` DESC LIMIT %s",
+        (user["id"], POSTS_PER_PAGE),
     )
     posts = make_posts(cursor.fetchall())
 
@@ -399,8 +404,11 @@ def get_posts():
 
     max_created_at = _parse_iso8601(max_created_at)
     cursor.execute(
-        "SELECT `id`, `user_id`, `body`, `mime`, `created_at` FROM `posts` WHERE `created_at` <= %s ORDER BY `created_at` DESC",
-        (max_created_at,),
+        "SELECT p.`id`, p.`user_id`, p.`body`, p.`mime`, p.`created_at` "
+        "FROM `posts` p JOIN `users` u ON p.`user_id` = u.`id` "
+        "WHERE p.`created_at` <= %s AND u.`del_flg` = 0 "
+        "ORDER BY p.`created_at` DESC LIMIT %s",
+        (max_created_at, POSTS_PER_PAGE),
     )
     results = cursor.fetchall()
     posts = make_posts(results)
