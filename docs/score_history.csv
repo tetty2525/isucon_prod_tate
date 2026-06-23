@@ -8,3 +8,4 @@ DateTime,Commit,Dirty,Score,Pass,CPU_User(%),CPU_Sys(%),CPU_Idle(%),CPU_IOWait(%
 2026-06-23 13:23:16,505b0f1,False,118305,True,61.1,19.6,15.8,3.5,0.15,0.15,2.63,perf: Batch load post comments and users
 2026-06-23 13:26:03,2a1cc42,False,119628,True,60.8,19.7,15.7,3.8,0.08,0.08,2.34,perf: Simplify batched comment loading
 2026-06-23 13:28:52,3eb156d,False,133885,True,58.9,21.3,15.9,3.9,0.02,0.02,4.19,perf: Cache users by id
+2026-06-23 13:34:06,7933a59,False,134807,True,57.5,20.5,17.5,4.5,0.09,0.08,2.87,ops: Reduce disk growth during benchmarks

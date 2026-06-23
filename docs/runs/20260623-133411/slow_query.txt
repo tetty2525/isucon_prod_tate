@@ -1,0 +1,120 @@
+
+# 3.4s user time, 80ms system time, 51.84M rss, 57.81M vsz
+# Current date: Tue Jun 23 13:34:17 2026
+# Hostname: ip-192-168-1-10
+# Files: /var/log/mysql/mysql-slow.log
+# Overall: 21.77k total, 28 unique, 335 QPS, 0.46x concurrency ___________
+# Time range: 2026-06-23T04:32:49 to 2026-06-23T04:33:54
+# Attribute          total     min     max     avg     95%  stddev  median
+# ============     ======= ======= ======= ======= ======= ======= =======
+# Exec time            30s    40us      3s     1ms     4ms    23ms   445us
+# Lock time           50ms       0   925us     2us     1us    14us     1us
+# Rows sent          1.21M       0    1000   58.28  381.65  113.17    8.91
+# Rows examine       1.29M       0    1000   61.93  381.65  113.65   10.84
+# Query size        86.72M      17   1.26M   4.08k  313.99  59.85k   97.36
+
+# Profile
+# Rank Query ID                       Response time Calls R/Call V/M   Ite
+# ==== ============================== ============= ===== ====== ===== ===
+#    1 0xCC6D4981B1781B1B8B6C7C37F... 11.7880 39.7%  8098 0.0015  0.00 SELECT comments
+#    2 0x009A61E5EFBD5A5E4097914B4...  4.0043 13.5%   149 0.0269  0.01 INSERT posts
+#    3 0x1107893DB792818FBD0704062...  3.4527 11.6%     1 3.4527  0.00 SELECT posts
+#    4 0x04A14C628C9DBA2FC3B5E9413...  2.4909  8.4%  1119 0.0022  0.00 SELECT posts
+#    5 0xE83B5CEE90073D4A0C8A2D869...  1.6874  5.7%  4064 0.0004  0.00 SELECT posts
+#    6 0x9F2038550F51B0A3AB05CA526...  1.1691  3.9%   245 0.0048  0.00 INSERT comments
+#    7 0x19759A5557089FD5B718D440C...  1.0795  3.6%  1735 0.0006  0.00 SELECT posts
+#    8 0xE05A7CB584E44F5419E5214DD...  1.0678  3.6%  1920 0.0006  0.00 SELECT posts
+#    9 0x26489ECBE26887E480CA8067F...  1.0649  3.6%   239 0.0045  0.00 INSERT users
+#   10 0xA047A0D0BA167343E5B367867...  0.4803  1.6%  1713 0.0003  0.00 SELECT users
+# MISC 0xMISC                          1.3966  4.7%  2492 0.0006   0.0 <18 ITEMS>
+
+# Query 1: 134.97 QPS, 0.20x concurrency, ID 0xCC6D4981B1781B1B8B6C7C37FAF28107 at byte 1658716
+# Scores: V/M = 0.00
+# Time range: 2026-06-23T04:32:54 to 2026-06-23T04:33:54
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count         37    8098
+# Exec time     39     12s    96us    16ms     1ms     4ms     1ms   925us
+# Lock time     32    17ms       0   758us     2us     1us    13us     1us
+# Rows sent     79 989.75k       0     439  125.15  400.73  164.06    9.83
+# Rows examine  75 989.75k       0     439  125.15  400.73  164.06    9.83
+# Query size     2   1.95M      85     323  251.93  313.99   92.07  284.79
+# String:
+# Databases    isuconp
+# Hosts        localhost
+# Users        isuconp
+# Query_time distribution
+#   1us
+#  10us  #
+# 100us  ################################################################
+#   1ms  ###########################################################
+#  10ms  #
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuconp` LIKE 'comments'\G
+#    SHOW CREATE TABLE `isuconp`.`comments`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT * FROM `comments` WHERE `post_id` IN (11264,11261,11262,11263,10000,9999,9998,9997,9996,9995,9994,9993,9992,9991,9990,9989,9988,9987,9986,9985,9984,9983,9982,9981,9980,9979,9978,9977,9976,9975,9974,9973,9972,9971,9970,9969,9968,9967,9966,9965) ORDER BY `post_id`, `created_at` DESC\G
+
+# Query 2: 2.48 QPS, 0.07x concurrency, ID 0x009A61E5EFBD5A5E4097914B4DBD1C07 at byte 40833959
+# Scores: V/M = 0.01
+# Time range: 2026-06-23T04:32:54 to 2026-06-23T04:33:54
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0     149
+# Exec time     13      4s     5ms    67ms    27ms    56ms    19ms    14ms
+# Lock time      0   233us     1us     3us     1us     1us       0     1us
+# Rows sent      0       0       0       0       0       0       0       0
+# Rows examine   0       0       0       0       0       0       0       0
+# Query size    87  75.77M  70.69k   1.26M 520.71k   1.09M 463.05k 130.04k
+# String:
+# Databases    isuconp
+# Hosts        localhost
+# Users        isuconp
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms  #####################
+#  10ms  ################################################################
+# 100ms
+#    1s
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuconp` LIKE 'posts'\G
+#    SHOW CREATE TABLE `isuconp`.`posts`\G
+INSERT INTO `posts` (`user_id`, `mime`, `imgdata`, `body`) VALUES (233,'image/png','�PNG\r\n\Z\n\0\0\0\rIHDR\0\0\0\0\0\0\0\0\05؂Z\0\0\0gAMA\0\0���a\0\0\0 cHRM\0\0z&\0\0��\0\0�\0\0\0�\�\0\0u0\0\0\�`\0\0:�\0\0p��Q<\0\0\0bKGD\0�\0�\0�����\0\0�\0IDATx\�t�K�$K�%��#�j\�\�{TU٘n 4w\���+p�1䀬\�\�\�\���\�f�\"g��\�\0wqy\�\�\�\�TE\�K��?�/\�NR��1[\�c\��\�\�\�\��u\�\���\�M\��z�\�\�6_O7��\�\�T�ak�1F�\'�\��Ww�8fȸm����\�ǭ�\�9�\�\�}<��v\���\�\�\�\�AI\�b��wc�yk\�m�\�\���\�L%E\�\�ږ\�R\�\�y�7\0��~��h�\�tw4���\��\�6А\�\�w�W߾z{\0h\�\�8z\�\�7\�F\�\Zn\�9b��i\�<\�#\��\�ǘc>3g�c\��D�@�e�=�\�9���5c\Z1���9,1�\�zk\�\�\�3\�P�\�\rd2J\��t��\�w\�c>oMRfJ$L`4s& F��\�\�8\�1\�?ܷ�v�m�w\�[\��~\��v�=\�F�	�(ID��HZ���>\�(R@��FjJ��\��5]recR	ʤ�����\�\�M\�\�\�n=\"��n4\�y�q\�co�\0����\0\�Wح�\�PFH\�\�\�=a1\���@��m\�\�\ZI���\��\�\�$\�\�\�`\0$\�`fN\�\�:\��A:>�1\�\�\r\�q�Gf\�9gh\n)&��93\'\rɈ\�In\�\0��)	#\�il�#$w�df\��]|\�ޭy�;\�@?\"g\�u�\�\�|�\�q�\�<#�\�IJ<\�3\��\�\�g\0\r�`z\�\�\�ao�\�\�[ۻ\�\�=6�f\�|J�ZT�\�\�&MR2�z4\�cfd}�\�,sFķ\�M342�0�\Z�\0`\�c���x�F̐\�H	HQ�t�䜱�\�IĴЭys:85͌���\Z\�8�\�1\'D�6\�Ht�)\'&�3\�{\��\�\�\�L0�\�\��}\00\�s\�t\�\���)�\�ݛ\�af\r��\�|\�1\"2�HLaL�\rr�4CG@R�Ha&R��\�̤H�h0é�sXb#n��\�q\����_�<��\�\r\�\r~\�\�Z;?\�[�\�Zf�^�\�<�\�\��\�x\0v�g\��v{\�\�{\��\�\�4\�\��;\�x\����}3s\�\�\�\�8��M\�1bf��}\�\�P(I��\��\�\���:\�\'��:S)\�\�#f��\'Rrm\�\�\0(��\�\�\�b@\'\\�;�\���[��n�w�o\�\�\���\�\�\�Q�K��s\��q>�sL�\�1	8Z�)�\�\�3b$D$�@\0� \� 21\'\��F\"\��d}c&���\�\�\�\�\��.\' R�gs��\Z�\�\� �s}JH �;]ډGǗ�ݻ5�\�\�֙\��\�{�\�>0Zow��\��|c\�\�\�\0\�\�\'0N�HBy�\�fFk�I�u\�H�fx{{�\�\�\��\��\�?�_~�\�׿�\�/���\����\�￟[	$\�@��A���Iws73\0�<Iv\�\�ۭs\�֙����13�\�\�\�\�\�\�\�\��\�?�\�ۆ��}\�m�1\�D`�\�9_\�\�&#$�!\�\��\�뗷}#\�qO3�ef\�Y癳\�\���\�H\��8?\�H\�zk��\�\��\���;���1\�Z\�\Zǈi���4F�\��x�q$\0�/�9\"`\�\��\�}�\�\�\��8�s�93\"\�,\�\�\�zk��ջ<b\�{�\r�\�:�\���y7���J4��SϏq�\����3�\�\�\��5�q�\�\�叿\�Aop{�x�\�\�Zk����c\�tɅ����\�\��\�x�\�\�\�=1\�~��?�?�\�\�\�\�_!L\"\"�Ys�\�\�Ʉ\�4\�@{\�n\�z��?\�\�H:S�[۷~�M\�y��\�TRb�\�8�\�\�֑c<޶o߾\�ޟ\�G\�\�\�nf\�\�\�\�\��v۶mۜf�\�3S��˿D\�\�6kNF\�\�[��c��~\'6�m\�mƏ?�ׇ��\�\"b\�P��\�u�\'-\�u�\�[@$?WB@�\�m\��\�x|��L\�\�F�\���\��\���_�\��\�?��>�\��\�y�ӝf��\�x<�/�p�\�\�\�\�~{�\�?�i�%_�\�3�?��m[\�\��~�r߿)\��is<3\�\�r\ZՄTf7�ǑG\�:\�l�c:lk\�\�\�\�3\�s\�\�\Z\��A\�2�b��&�A�\�Io�^\�\�[�\���\�\�in\�\�\Zd�7��dkM\��s���\�\�t����7\�sU�toٚ�\������T\0��̄()�N��>땵(ݫ�\\\���As�\��2�2\�=)\�\�Ub\�121C\n\�\�1\�H\�̔\�J^/ƌ\�\�07\�\�N��F\�$\�*\�\�\�L@�\�3E*��TS\n�` �R*\�EF33��\�\�\�\�\�\�Ϻ)��sf�i�95�A\n�T\�F�Z\�$�����RJ*-3�\0�TPf�\�\�ԣ��\�\�\�D\�Yz\�\�\�\�fV�Ȑ�C	eP\�t\�1#X\�H6:Y��A6c\0&�c*��\�>\�G[�!\�{��\�ZCjΩD^\���L�X�}m$ͨ�fD@\�H@�\\�\�4��S��Zw�sz\�\�o\�\�\�d�>�%�Y���Lղ\��\�$9\�P�\�Kt�U���\���LF�\��\�}HFF=��\\�\�\�y\�éZ��4\�`*SԵh��L?�����@\����LM��P\0\�LD\�\�nm-^�`-���\�@?��P�G\���`@׭�ʔ\Z\�\"�$��UY\�+RD*fB*mJj\�\�\\?@V\�T\�1\�\�\"A�֜`@�&ů7����\'W�Z7G\n\'�\r\��ݱ9\�!a�~�6�ѻ�\�7RILe@I��n2fFI$�\�\�\��vSD\�h�)\"\"�\�Hr\�}\�\0\�n�\�eM�Iຘ��s���.�T�\�	V��\�g]\�u\�h\��\�\��!0��4#�1\�e�fFs�0�3ϵa%>�G=�\�Q3sfN������@~\�$�ip ӓ&��g�V8�jG�/\�jP�\0\"5\�cF(��9\�\�S�	If��\�	\�	�5 �ft���n\�L3s$\�9d\"23���S��\�\�R��n�1\�P��f�\�-p}�x��ch�A�/_\��\�?���\��O߾}�\��\��\���\�\�x\�鬯�L\������\�C<G��\�\�9H����\�n\�kN	\�y�ȏ��\�\�0\�\��\�q{<�8��\�\�|g�\�i%k4��h#�0C\�\�ݬ\�\�f�9g��@\nf�\�\��)�\�+	�\�\�#L&Em�Yŉ(�^_�5\�\��9_��;��)x\�6\�!�\�.3Gȑ\�[Dh�\�Nb\�<\�\�74�֚5�\�\�9\"3�P�\�y�\�8\�\�\�ۆ\�1\�\'�\�fux�r.D@\�Yh\�\�s�\��\�\�ߏ\�8\�ض\r\�8���{k\�}��f\�s�ᴷ�����933\"�F8��HefByI9CFВ�F\nU���پ\�l~\�x\�k�s̄�\Zm\��\�s\��\�o��}y\����;�\�\�\�\�\����[a�m\�A콵��%m\�\�\�s\�3{=��
+
+# Query 3: 0 QPS, 0x concurrency, ID 0x1107893DB792818FBD0704062A7EF713 at byte 1570
+# Scores: V/M = 0.00
+# Time range: all events occurred at 2026-06-23T04:32:53
+# Attribute    pct   total     min     max     avg     95%  stddev  median
+# ============ === ======= ======= ======= ======= ======= ======= =======
+# Count          0       1
+# Exec time     11      3s      3s      3s      3s      3s       0      3s
+# Lock time      0     4us     4us     4us     4us     4us       0     4us
+# Rows sent      0    1000    1000    1000    1000    1000       0    1000
+# Rows examine   0    1000    1000    1000    1000    1000       0    1000
+# Query size     0      81      81      81      81      81       0      81
+# String:
+# Databases    isuconp
+# Hosts        localhost
+# Users        isuconp
+# Query_time distribution
+#   1us
+#  10us
+# 100us
+#   1ms
+#  10ms
+# 100ms
+#    1s  ################################################################
+#  10s+
+# Tables
+#    SHOW TABLE STATUS FROM `isuconp` LIKE 'posts'\G
+#    SHOW CREATE TABLE `isuconp`.`posts`\G
+# EXPLAIN /*!50100 PARTITIONS*/
+SELECT `id`, `mime`, `imgdata` FROM `posts` ORDER BY `created_at` DESC LIMIT 1000\G
+
+# Query 4: 18.65 QPS, 0.04x concurrency, ID 0x04A14C628C9DBA2FC3B5E9413E7654F2 at byte 32801187

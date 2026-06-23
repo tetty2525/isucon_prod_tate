@@ -1,0 +1,4 @@
+timestamp=20260623-133411
+commit=7933a59
+dirty=True
+message=ops: Reduce disk growth during benchmarks
