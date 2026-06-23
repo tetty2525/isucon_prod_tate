@@ -1,0 +1,55 @@
+Tue Jun 23 13:03:11 JST 2026
+ 13:03:11 up 10:36,  2 users,  load average: 0.66, 0.45, 0.25
+               total        used        free      shared  buff/cache   available
+Mem:           3.7Gi       1.2Gi       169Mi       2.9Mi       2.7Gi       2.5Gi
+Swap:          1.0Gi          0B       1.0Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root        15G   13G  2.5G  84% /
+● nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/usr/lib/systemd/system/nginx.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-06-23 13:01:26 JST; 1min 44s ago
+       Docs: man:nginx(8)
+    Process: 30173 ExecStartPre=/usr/sbin/nginx -t -q -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+    Process: 30175 ExecStart=/usr/sbin/nginx -g daemon on; master_process on; (code=exited, status=0/SUCCESS)
+   Main PID: 30176 (nginx)
+      Tasks: 3 (limit: 4496)
+     Memory: 6.0M (peak: 10.2M)
+        CPU: 3.066s
+     CGroup: /system.slice/nginx.service
+             ├─30176 "nginx: master process /usr/sbin/nginx -g daemon on; master_process on;"
+             ├─30177 "nginx: worker process"
+             └─30178 "nginx: worker process"
+
+● mysql.service - MySQL Community Server
+     Loaded: loaded (/usr/lib/systemd/system/mysql.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-06-23 13:01:30 JST; 1min 41s ago
+    Process: 30195 ExecStartPre=/usr/share/mysql/mysql-systemd-start pre (code=exited, status=0/SUCCESS)
+   Main PID: 30204 (mysqld)
+     Status: "Server is operational"
+      Tasks: 38 (limit: 4496)
+     Memory: 781.7M (peak: 782.2M)
+        CPU: 22.974s
+     CGroup: /system.slice/mysql.service
+             └─30204 /usr/sbin/mysqld
+
+● isu-python.service - isu-python
+     Loaded: loaded (/etc/systemd/system/isu-python.service; enabled; preset: enabled)
+     Active: active (running) since Tue 2026-06-23 13:01:27 JST; 1min 44s ago
+   Main PID: 30183 (gunicorn)
+      Tasks: 3 (limit: 4496)
+     Memory: 48.1M (peak: 51.7M)
+        CPU: 37.351s
+     CGroup: /system.slice/isu-python.service
+             ├─30183 /home/isucon/private_isu/webapp/python/.venv/bin/python3 /home/isucon/private_isu/webapp/python/.venv/bin/gunicorn app:app -b 0.0.0.0:8080 --log-file - --access-logfile -
+             └─30189 /home/isucon/private_isu/webapp/python/.venv/bin/python3 /home/isucon/private_isu/webapp/python/.venv/bin/gunicorn app:app -b 0.0.0.0:8080 --log-file - --access-logfile -
+
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9791.jpg HTTP/1.0" 200 182503 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9792.jpg HTTP/1.0" 200 142128 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9790.jpg HTTP/1.0" 200 118655 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9791.jpg HTTP/1.0" 200 182503 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9789.jpg HTTP/1.0" 200 65862 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9790.jpg HTTP/1.0" 200 118655 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9788.jpg HTTP/1.0" 200 147049 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9789.jpg HTTP/1.0" 200 65862 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9787.jpg HTTP/1.0" 200 75808 "-" "benchmarker"
+Jun 23 13:02:34 ip-192-168-1-10 gunicorn[30189]: 127.0.0.1 - - [23/Jun/2026:13:02:34 +0900] "GET /image/9786.jpg HTTP/1.0" 200 78231 "-" "benchmarker"

@@ -1,2 +1,3 @@
 DateTime,Commit,Dirty,Score,Pass,CPU_User(%),CPU_Sys(%),CPU_Idle(%),CPU_IOWait(%),Net_RX(MB),Net_TX(MB),LoadAvg,Change
 2026-06-23 12:59:01,4a39a37,True,10790,True,42.6,11.1,40.6,5.7,0.01,0.01,1.26,docs: Add handover documentation
+2026-06-23 13:02:43,f6fa128,False,10702,True,42.7,11.1,41.2,5.1,0.96,0.72,0.83,bench: Record benchmark metadata and snapshots
