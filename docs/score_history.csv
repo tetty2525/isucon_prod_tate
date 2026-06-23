@@ -10,3 +10,4 @@ DateTime,Commit,Dirty,Score,Pass,CPU_User(%),CPU_Sys(%),CPU_Idle(%),CPU_IOWait(%
 2026-06-23 13:28:52,3eb156d,False,133885,True,58.9,21.3,15.9,3.9,0.02,0.02,4.19,perf: Cache users by id
 2026-06-23 13:34:06,7933a59,False,134807,True,57.5,20.5,17.5,4.5,0.09,0.08,2.87,ops: Reduce disk growth during benchmarks
 2026-06-23 13:37:05,264ab2a,False,130181,True,57.0,23.6,16.0,3.4,0.17,0.15,4.03,perf: Cache comments in memcached
+2026-06-23 13:40:43,a3b98cc,False,134649,True,59.3,21.2,15.9,3.6,0.29,0.25,2.82,"Revert ""perf: Cache comments in memcached"""
