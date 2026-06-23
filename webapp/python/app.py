@@ -1,6 +1,7 @@
 import datetime
 import os
 import pathlib
+import pickle
 import re
 import shlex
 import subprocess
@@ -24,6 +25,7 @@ MIME_EXTENSIONS = {
 }
 STATIC_PATH = pathlib.Path(__file__).resolve().parent.parent / "public"
 IMAGE_DIR = STATIC_PATH / "image"
+COMMENT_CACHE_PREFIX = "comments:v1:"
 
 
 _config = None
@@ -69,6 +71,7 @@ def db():
 def db_initialize():
     global _user_cache
     _user_cache = {}
+    memcache().flush_all()
 
     cur = db().cursor()
     sqls = [
@@ -201,6 +204,40 @@ def fetch_users(user_ids):
     return {user_id: _user_cache.get(user_id) for user_id in ids}
 
 
+def comment_cache_key(post_id):
+    return f"{COMMENT_CACHE_PREFIX}{post_id}"
+
+
+def fetch_comments_for_posts(post_ids):
+    comments_by_post = {}
+    missing_ids = []
+    mc = memcache()
+
+    for post_id in post_ids:
+        cached = mc.get(comment_cache_key(post_id))
+        if cached is None:
+            missing_ids.append(post_id)
+        else:
+            comments_by_post[post_id] = pickle.loads(cached)
+
+    if missing_ids:
+        cursor = db().cursor()
+        cursor.execute(
+            "SELECT * FROM `comments` "
+            f"WHERE `post_id` IN ({placeholders(missing_ids)}) "
+            "ORDER BY `post_id`, `created_at` DESC",
+            missing_ids,
+        )
+        loaded = {post_id: [] for post_id in missing_ids}
+        for comment in cursor:
+            loaded[comment["post_id"]].append(comment)
+        for post_id, comments in loaded.items():
+            comments_by_post[post_id] = comments
+            mc.set(comment_cache_key(post_id), pickle.dumps(comments), expire=60)
+
+    return comments_by_post
+
+
 def make_posts(results, all_comments=False):
     posts = []
     post_candidates = list(results)
@@ -208,19 +245,11 @@ def make_posts(results, all_comments=False):
         return posts
 
     post_ids = [post["id"] for post in post_candidates]
-    cursor = db().cursor()
-
-    cursor.execute(
-        "SELECT * FROM `comments` "
-        f"WHERE `post_id` IN ({placeholders(post_ids)}) "
-        "ORDER BY `post_id`, `created_at` DESC",
-        post_ids,
-    )
-    comments_by_post = {}
+    comments_by_post = fetch_comments_for_posts(post_ids)
     user_ids = {post["user_id"] for post in post_candidates}
-    for comment in cursor:
-        comments_by_post.setdefault(comment["post_id"], []).append(comment)
-        user_ids.add(comment["user_id"])
+    for comments in comments_by_post.values():
+        for comment in comments:
+            user_ids.add(comment["user_id"])
 
     users = fetch_users(user_ids)
 
@@ -538,6 +567,7 @@ def post_comment():
     )
     cursor = db().cursor()
     cursor.execute(query, (post_id, me["id"], flask.request.form["comment"]))
+    memcache().delete(comment_cache_key(post_id))
 
     return flask.redirect("/posts/%d" % post_id)
 
