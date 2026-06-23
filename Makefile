@@ -10,7 +10,8 @@ deploy-conf:
 	scp -i $(SSH_KEY) etc/nginx/nginx.conf $(SSH_USER)@$(SERVER_IP):/tmp/nginx.conf
 	scp -i $(SSH_KEY) etc/nginx/isucon.conf $(SSH_USER)@$(SERVER_IP):/tmp/isucon.conf
 	scp -i $(SSH_KEY) etc/mysql/mysqld.cnf $(SSH_USER)@$(SERVER_IP):/tmp/mysqld.cnf
-	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo cp /tmp/nginx.conf /etc/nginx/nginx.conf && sudo cp /tmp/isucon.conf /etc/nginx/sites-available/isucon.conf && sudo cp /tmp/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf"
+	scp -i $(SSH_KEY) etc/systemd/isu-python.service $(SSH_USER)@$(SERVER_IP):/tmp/isu-python.service
+	ssh -i $(SSH_KEY) $(SSH_USER)@$(SERVER_IP) "sudo cp /tmp/nginx.conf /etc/nginx/nginx.conf && sudo cp /tmp/isucon.conf /etc/nginx/sites-available/isucon.conf && sudo cp /tmp/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf && sudo cp /tmp/isu-python.service /etc/systemd/system/isu-python.service && sudo systemctl daemon-reload"
 
 deploy-app:
 	rsync -avz --exclude='__pycache__/' --exclude='*.pyc' -e "ssh -i $(SSH_KEY) -o StrictHostKeyChecking=no" webapp/ $(SSH_USER)@$(SERVER_IP):/home/isucon/private_isu/webapp/
